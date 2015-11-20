@@ -34,7 +34,6 @@ module SmartOffice
       telegram_bot_token = ENV["telegram_bot_token"]
       telegram_authorized_chats = ENV["telegram_authorized_chats"].split(",").map(&:to_i)      
       web_cam_ip = ENV["web_cam_ip"]
-      easter_egg = true
       
       puts "telegram_bot: started"
       Telegram::Bot::Client.run(telegram_bot_token) do |bot|
@@ -47,14 +46,6 @@ module SmartOffice
                 begin
                   open('photo.jpg', 'wb') do |file|
                     file << open("http://#{web_cam_ip}/photo.jpg").read
-                  end
-                  t = Time.now
-                  if easter_egg && t.hour == 23
-                    puts "hour=#{t.hour} within time range, easter_egg=#{easter_egg}"
-                    overlayImage("ghost.png")
-                    easter_egg = false
-                  else
-                    puts "hour=#{t.hour} outside time range, easter_egg=#{easter_egg}"
                   end
                   bot.api.send_photo(chat_id: message.chat.id, photo: File.new("photo.jpg"))
                 rescue Exception => e
