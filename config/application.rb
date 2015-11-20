@@ -31,9 +31,10 @@ module SmartOffice
     end
     
     def start_telegram_bot
-      token = '122897784:AAGuY-JLZ2OSZwVCy_s_aq_I8FSwJbBQgko'
+      telegram_bot_token = ENV["telegram_bot_token"]
+      web_cam_ip = ENV["web_cam_ip"]
       puts "telegram_bot: started"
-      Telegram::Bot::Client.run(token) do |bot|
+      Telegram::Bot::Client.run(telegram_bot_token) do |bot|
         bot.listen do |message|
           case message.text
             when '/start'
