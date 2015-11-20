@@ -32,23 +32,53 @@ module SmartOffice
     
     def start_telegram_bot
       telegram_bot_token = ENV["telegram_bot_token"]
+      telegram_authorized_chats = ENV["telegram_authorized_chats"].split(",").map(&:to_i)      
       web_cam_ip = ENV["web_cam_ip"]
+      easter_egg = true
+      
       puts "telegram_bot: started"
       Telegram::Bot::Client.run(telegram_bot_token) do |bot|
         bot.listen do |message|
           case message.text
-            when '/start'
-              puts "telegram_bot: /start"
-              bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name}")
-              Message.create(user: message.from.first_name, action: message.text)
-            when '/stop'
-              puts "telegram_bot: /stop"
-              bot.api.send_message(chat_id: message.chat.id, text: "Bye, #{message.from.first_name}")
+            when '/pong'
+              puts "telegram_bot: photo request from #{message.from.first_name} #{message.from.last_name}"
+              if telegram_authorized_chats.include?(message.chat.id)
+                puts "telegram_bot: authorized"
+                begin
+                  open('photo.jpg', 'wb') do |file|
+                    file << open("http://#{web_cam_ip}/photo.jpg").read
+                  end
+                  t = Time.now
+                  if easter_egg && t.hour == 23
+                    puts "hour=#{t.hour} within time range, easter_egg=#{easter_egg}"
+                    overlayImage("ghost.png")
+                    easter_egg = false
+                  else
+                    puts "hour=#{t.hour} outside time range, easter_egg=#{easter_egg}"
+                  end
+                  bot.api.send_photo(chat_id: message.chat.id, photo: File.new("photo.jpg"))
+                rescue Exception => e
+                  bot.api.send_message(chat_id: message.chat.id, text: e.message)
+                end
+              else
+                puts "telegram_bot: unauthorized"
+                bot.api.send_photo(chat_id: message.chat.id, photo: File.new("forbidden.jpg"))
+              end
+            when '/debug'
+              bot.api.send_message(chat_id: message.chat.id, text: "debug: #{message.from.first_name} from chat=#{message.chat.id}")
             else
               puts "telegram_bot: else"
           end
         end
       end
     end
+
+    def overlayImage(filename)
+      dst = Magick::Image.read("photo.jpg") {self.size = "640x480"}.first
+      src = Magick::Image.read(filename).first
+      result = dst.composite(src, Magick::CenterGravity, Magick::OverCompositeOp)
+      result.write('photo.jpg')
+    end    
+
   end
 end
