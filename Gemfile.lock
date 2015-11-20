@@ -201,6 +201,7 @@ DEPENDENCIES
   sqlite3
   telegram-bot-ruby
   turbolinks
+  tzinfo-data
   uglifier (>= 1.3.0)
   web-console (~> 2.0)
 

@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
+
 gem 'rails',            '4.2.3'
 gem 'sass-rails',       '>= 3.2'
 gem 'bootstrap-sass',   '~> 3.3.5'
