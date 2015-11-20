@@ -38,6 +38,7 @@ module SmartOffice
       puts "telegram_bot: started"
       Telegram::Bot::Client.run(telegram_bot_token) do |bot|
         bot.listen do |message|
+          Message.create(user: message.from.first_name, action: message.text)
           case message.text
             when '/pong'
               puts "telegram_bot: photo request from #{message.from.first_name} #{message.from.last_name}"
