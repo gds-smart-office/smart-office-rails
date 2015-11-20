@@ -39,6 +39,7 @@ module SmartOffice
             when '/start'
               puts "telegram_bot: /start"
               bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name}")
+              Message.create(user: message.from.first_name, action: message.text)
             when '/stop'
               puts "telegram_bot: /stop"
               bot.api.send_message(chat_id: message.chat.id, text: "Bye, #{message.from.first_name}")
@@ -47,6 +48,6 @@ module SmartOffice
           end
         end
       end
-    end    
+    end
   end
 end
