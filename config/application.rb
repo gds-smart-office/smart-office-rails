@@ -60,7 +60,6 @@ module SmartOffice
     end
     
     def perform_action(bot, message)
-      createMessage(message)
       log(message)      
       case message.text
         when "/#{@@password}"
@@ -69,11 +68,14 @@ module SmartOffice
           pong(bot, message)
         when '/drone'
           drone(bot, message)
+        when '/help'
+          help(bot, message)
         when '/debug'
           send_message(bot, message, "debug: #{user_info(message)} #{chat_info(message)}")
         else
           puts "telegram_bot: else #{message.text}"
       end
+      createMessage(message)
     end
 
     def createMessage(message)
@@ -94,7 +96,7 @@ module SmartOffice
         last_name: message.from.last_name,
         username: message.from.username
       )
-      send_message(bot, message, "Welcome #{message.from.first_name}, you are successfully authenticated to GDS Smart Office.")
+      send_message(bot, message, "Welcome #{message.from.first_name}, you are successfully authenticated.")
     end
     
     def isAuthorized?(message)
@@ -122,6 +124,15 @@ module SmartOffice
       else
         send_photo(bot, message, "forbidden.jpg")
       end
+    end
+    
+    def help(bot, message)
+      help =  "They called me Ping La Pong.\n\n" +
+              "You can control me by sending these commands:\n\n" +
+              "/[password] - Authenticate, please get the password from my Creator\n" +
+              "/pong - Check status for Ping Pong table\n" +
+              "/drone - Check status for Drone meeting room\n"
+      send_message(bot, message, help)      
     end
     
     # Helpers
@@ -154,10 +165,6 @@ module SmartOffice
     end    
     
     # Logger helpers
-    def log_system(text="OK")
-      puts "telegram_bot: #{text}"      
-    end
-    
     def log(message, text="OK")
       puts "telegram_bot[#{action(message)}][#{user_info(message)}][#{chat_info(message)}]: #{text}"
     end
