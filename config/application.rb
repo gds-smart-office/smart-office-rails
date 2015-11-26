@@ -27,16 +27,15 @@ module SmartOffice
 
     config.after_initialize do
       @@telegram_bot_token =        ENV["telegram_bot_token"]
-      @@telegram_authorized_chats = ENV["telegram_authorized_chats"].split(",").map(&:to_i)
       @@pong_ip =                   ENV["pong_ip"]
       @@drone_ip =                  ENV["drone_ip"]
       @@restart_cooldown =          ENV["restart_cooldown"].to_f
-      @@password =                  ENV["password"]      
-      
-      run_telegram_bot
+      @@password =                  ENV["password"]
+
+      run_bot
     end
     
-    def run_telegram_bot
+    def run_bot
       @@thread ||= Thread.new do      
         while true do
           startTime = Time.now
@@ -46,7 +45,7 @@ module SmartOffice
               bot.listen do |message|
                 messageTime = Time.now
                 if (messageTime - startTime) > @@restart_cooldown
-                  perform_telegram_action(bot, message)
+                  perform_action(bot, message)
                 else
                   log(message, "cooldown,start=#{startTime},now=#{messageTime},elasped=#{messageTime - startTime}")
                 end                
@@ -60,8 +59,8 @@ module SmartOffice
       end
     end
     
-    def perform_telegram_action(bot, message)
-      Message.create(user: message.from.first_name, action: message.text)
+    def perform_action(bot, message)
+      createMessage(message)
       log(message)      
       case message.text
         when "/#{@@password}"
@@ -76,6 +75,15 @@ module SmartOffice
           puts "telegram_bot: else #{message.text}"
       end
     end
+
+    def createMessage(message)
+      Message.create(
+        user_id: message.from.id,
+        user_name: "#{message.from.first_name} #{message.from.last_name}",
+        chat_id: message.chat.id,
+        chat_title: getChatTitle(message),
+        action: message.text)
+    end    
     
     # Authentication
     def authenticate(bot, message)
@@ -163,7 +171,11 @@ module SmartOffice
     end
     
     def chat_info(message)
-      "chat=#{message.chat.id}"      
+      "chat=#{getChatTitle(message)}, #{message.chat.id}"
+    end
+    
+    def getChatTitle(message)
+      message.chat.type == "private" ? "private" : message.chat.title
     end
   end
 end
