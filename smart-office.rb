@@ -28,7 +28,7 @@ while true do
           case message.text
             when '/debug'      
               bot.api.send_message(chat_id: message.chat.id, text: "debug: #{message.from.first_name} from chat=#{message.chat.id}")
-            when '/pong'
+            when '/pong2'
               puts "photo request from #{message.from.first_name} #{message.from.last_name}"
               if authorized_chats.include?(message.chat.id)
                 puts "authorized"

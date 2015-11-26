@@ -65,15 +65,16 @@ module SmartOffice
       case message.text
         when "/#{@@password}"
           authenticate(bot, message)
-        when '/pong'
-          pong(bot, message)          
+        when '/pong2'
+          pong(bot, message)
         when '/debug'
-          bot.api.send_message(chat_id: message.chat.id, text: "debug: #{user_info(message)} #{chat_info(message)}")
+          send_message(bot, message, "debug: #{user_info(message)} #{chat_info(message)}")
         else
           puts "telegram_bot: else #{message.text}"
       end
     end
     
+    # Authentication
     def authenticate(bot, message)
       log(message, "authenticated")
       User.create(
@@ -82,21 +83,41 @@ module SmartOffice
         last_name: message.from.last_name,
         username: message.from.username
       )
+      send_message(bot, message, "Welcome #{message.from.first_name}, you are successfully authenticated to GDS Smart Office.")
     end
     
-    def pong(bot, message)
-      if @@telegram_authorized_chats.include?(message.chat.id)
+    def isAuthorized?(message)
+      isAuthorized = User.exists?(user_id: message.from.id)
+      if isAuthorized
         log(message, "authorized")
+      else
+        log(message, "unauthorized")
+      end
+      isAuthorized
+    end
+    
+    # Telegram bot api
+    def send_message(bot, message, text)
+      bot.api.send_message(chat_id: message.chat.id, text: text)      
+    end
+    
+    def send_photo(bot, message, filename)
+      bot.api.send_photo(chat_id: message.chat.id, photo: File.new(filename))      
+    end
+    
+    # Actions
+    def pong(bot, message)
+      if isAuthorized?(message)
         begin
           open('photo.jpg', 'wb') do |file|
-            file << open("http://#{@@web_cam_ip}/photo.jpg").read
+            #   file << open("http://#{@@web_cam_ip}/photo.jpg").read            
+            file << open("http://#{@@web_cam_ip}",http_basic_authentication: ["admin", ""]).read
           end
-          bot.api.send_photo(chat_id: message.chat.id, photo: File.new("photo.jpg"))
+          send_photo(bot, message, "photo.jpg")
         rescue Exception => e
           bot.api.send_message(chat_id: message.chat.id, text: e.message)
         end
       else
-        log(message, "unauthorized")
         bot.api.send_photo(chat_id: message.chat.id, photo: File.new("forbidden.jpg"))
       end
     end
