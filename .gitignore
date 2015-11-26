@@ -23,4 +23,4 @@
 .idea/*
 
 # Ignore web cam files
-photo.jpg
+*.jpg

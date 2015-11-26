@@ -28,7 +28,8 @@ module SmartOffice
     config.after_initialize do
       @@telegram_bot_token =        ENV["telegram_bot_token"]
       @@telegram_authorized_chats = ENV["telegram_authorized_chats"].split(",").map(&:to_i)
-      @@web_cam_ip =                ENV["web_cam_ip"]
+      @@pong_ip =                   ENV["pong_ip"]
+      @@drone_ip =                  ENV["drone_ip"]
       @@restart_cooldown =          ENV["restart_cooldown"].to_f
       @@password =                  ENV["password"]      
       
@@ -67,6 +68,8 @@ module SmartOffice
           authenticate(bot, message)
         when '/pong2'
           pong(bot, message)
+        when '/drone'
+          drone(bot, message)
         when '/debug'
           send_message(bot, message, "debug: #{user_info(message)} #{chat_info(message)}")
         else
@@ -96,29 +99,33 @@ module SmartOffice
       isAuthorized
     end
     
-    # Telegram bot api
-    def send_message(bot, message, text)
-      bot.api.send_message(chat_id: message.chat.id, text: text)      
-    end
-    
-    def send_photo(bot, message, filename)
-      bot.api.send_photo(chat_id: message.chat.id, photo: File.new(filename))      
-    end
-    
     # Actions
     def pong(bot, message)
       if isAuthorized?(message)
-        begin
-          open('photo.jpg', 'wb') do |file|
-            #   file << open("http://#{@@web_cam_ip}/photo.jpg").read            
-            file << open("http://#{@@web_cam_ip}",http_basic_authentication: ["admin", ""]).read
-          end
-          send_photo(bot, message, "photo.jpg")
-        rescue Exception => e
-          bot.api.send_message(chat_id: message.chat.id, text: e.message)
-        end
+        send_photo_webcam(bot, message, @@pong_ip, "pong")
       else
-        bot.api.send_photo(chat_id: message.chat.id, photo: File.new("forbidden.jpg"))
+        send_photo(bot, message, "forbidden.jpg")
+      end
+    end
+
+    def drone(bot, message)
+      if isAuthorized?(message)
+        send_photo_webcam(bot, message, @@drone_ip, "drone")
+      else
+        send_photo(bot, message, "forbidden.jpg")
+      end
+    end
+    
+    # Helpers
+    def send_photo_webcam(bot, message, webcam_ip, name)
+      begin
+        open("#{name}.jpg", 'wb') do |file|
+          #   file << open("http://#{@@pong_ip}/photo.jpg").read         
+          file << open("http://#{webcam_ip}",http_basic_authentication: ["admin", ""]).read
+        end
+        send_photo(bot, message, "#{name}.jpg")
+      rescue Exception => e
+        bot.api.send_message(chat_id: message.chat.id, text: e.message)
       end
     end
     
@@ -128,6 +135,15 @@ module SmartOffice
       result = dst.composite(src, Magick::CenterGravity, Magick::OverCompositeOp)
       result.write('photo.jpg')
     end
+
+    # Telegram bot api
+    def send_message(bot, message, text)
+      bot.api.send_message(chat_id: message.chat.id, text: text)
+    end
+
+    def send_photo(bot, message, filename)
+      bot.api.send_photo(chat_id: message.chat.id, photo: File.new(filename))
+    end    
     
     # Logger helpers
     def log_system(text="OK")
