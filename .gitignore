@@ -18,3 +18,11 @@
 
 # Ignore application configuration
 /config/application.yml
+
+# Ignore RubyMine files
+.idea/*
+
+# Ignore web cam files
+photo.jpg
+
+
