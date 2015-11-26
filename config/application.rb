@@ -30,6 +30,7 @@ module SmartOffice
       @@telegram_authorized_chats = ENV["telegram_authorized_chats"].split(",").map(&:to_i)
       @@web_cam_ip =                ENV["web_cam_ip"]
       @@restart_cooldown =          ENV["restart_cooldown"].to_f
+      @@password =                  ENV["password"]      
       
       run_telegram_bot
     end
@@ -46,10 +47,7 @@ module SmartOffice
                 if (messageTime - startTime) > @@restart_cooldown
                   perform_telegram_action(bot, message)
                 else
-                  puts "telegram_bot: start: #{startTime}"
-                  puts "telegram_bot: now: #{messageTime}"
-                  puts "telegram_bot: elasped #{messageTime - startTime}"
-                  puts "telegram_bot: cooldown"
+                  log(message, "cooldown,start=#{startTime},now=#{messageTime},elasped=#{messageTime - startTime}")
                 end                
               end
             end
@@ -57,33 +55,49 @@ module SmartOffice
             p e.message
           end
         end
+        puts "telegram_bot: terminated"      
       end
     end
     
     def perform_telegram_action(bot, message)
       Message.create(user: message.from.first_name, action: message.text)
-      puts "telegram_bot: #{message.text} by #{message.from.first_name} from chat=#{message.chat.id}"      
+      log(message)      
       case message.text
+        when "/#{@@password}"
+          authenticate(bot, message)
         when '/pong'
-          puts "telegram_bot: photo request from #{message.from.first_name} #{message.from.last_name}"
-          if @@telegram_authorized_chats.include?(message.chat.id)
-            puts "telegram_bot: authorized"
-            begin
-              open('photo.jpg', 'wb') do |file|
-                file << open("http://#{@@web_cam_ip}/photo.jpg").read
-              end
-              bot.api.send_photo(chat_id: message.chat.id, photo: File.new("photo.jpg"))
-            rescue Exception => e
-              bot.api.send_message(chat_id: message.chat.id, text: e.message)
-            end
-          else
-            puts "telegram_bot: unauthorized"
-            bot.api.send_photo(chat_id: message.chat.id, photo: File.new("forbidden.jpg"))
-          end
+          pong(bot, message)          
         when '/debug'
-          bot.api.send_message(chat_id: message.chat.id, text: "debug: #{message.from.first_name} from chat=#{message.chat.id}")
+          bot.api.send_message(chat_id: message.chat.id, text: "debug: #{user_info(message)} #{chat_info(message)}")
         else
           puts "telegram_bot: else #{message.text}"
+      end
+    end
+    
+    def authenticate(bot, message)
+      log(message, "authenticated")
+      User.create(
+        user_id: message.from.id, 
+        first_name: message.from.first_name,
+        last_name: message.from.last_name,
+        username: message.from.username
+      )
+    end
+    
+    def pong(bot, message)
+      if @@telegram_authorized_chats.include?(message.chat.id)
+        log(message, "authorized")
+        begin
+          open('photo.jpg', 'wb') do |file|
+            file << open("http://#{@@web_cam_ip}/photo.jpg").read
+          end
+          bot.api.send_photo(chat_id: message.chat.id, photo: File.new("photo.jpg"))
+        rescue Exception => e
+          bot.api.send_message(chat_id: message.chat.id, text: e.message)
+        end
+      else
+        log(message, "unauthorized")
+        bot.api.send_photo(chat_id: message.chat.id, photo: File.new("forbidden.jpg"))
       end
     end
     
@@ -92,6 +106,27 @@ module SmartOffice
       src = Magick::Image.read(filename).first
       result = dst.composite(src, Magick::CenterGravity, Magick::OverCompositeOp)
       result.write('photo.jpg')
+    end
+    
+    # Logger helpers
+    def log_system(text="OK")
+      puts "telegram_bot: #{text}"      
+    end
+    
+    def log(message, text="OK")
+      puts "telegram_bot[#{action(message)}][#{user_info(message)}][#{chat_info(message)}]: #{text}"
+    end
+    
+    def action(message)
+      message.text
+    end
+    
+    def user_info(message)
+      "user=#{message.from.first_name} #{message.from.last_name},#{message.from.id}"      
+    end
+    
+    def chat_info(message)
+      "chat=#{message.chat.id}"      
     end
   end
 end
