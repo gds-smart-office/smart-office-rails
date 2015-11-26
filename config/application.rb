@@ -60,11 +60,10 @@ module SmartOffice
     end
     
     def perform_action(bot, message)
-      log(message)      
-      case message.text
+      case action(message)
         when "/#{@@password}"
           authenticate(bot, message)
-        when '/pong2'
+        when '/pong'
           pong(bot, message)
         when '/drone'
           drone(bot, message)
@@ -84,7 +83,7 @@ module SmartOffice
         user_name: "#{message.from.first_name} #{message.from.last_name}",
         chat_id: message.chat.id,
         chat_title: getChatTitle(message),
-        action: message.text)
+        action: action(message))
     end    
     
     # Authentication
@@ -170,7 +169,12 @@ module SmartOffice
     end
     
     def action(message)
-      message.text
+      action = message.text
+      index = action.index('@')
+      if index != nil
+        action = action[0..(index-1)]
+      end
+      action
     end
     
     def user_info(message)
