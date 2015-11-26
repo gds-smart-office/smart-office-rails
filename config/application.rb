@@ -126,11 +126,13 @@ module SmartOffice
     end
     
     def help(bot, message)
-      help =  "They called me Ping La Pong.\n\n" +
-              "You can control me by sending these commands:\n\n" +
-              "/[password] - Authenticate, please get the password from my Creator\n" +
+      help =  "Hello, I am Ping La Pong, you can control me by sending these commands:\n\n" +
               "/pong - Check status for Ping Pong table\n" +
-              "/drone - Check status for Drone meeting room\n"
+              "/drone - Check status for Drone meeting room\n\n" + 
+              "Don't get too excited and trigger happy in your chat group, you can be considerate by clicking @ppong_bot and sending the commands privately.\n\n" +
+              "Of cuz only authorized folks can control me, please find my creators for the /[password].\n\n" +
+              "If you wish to contribute, you can check out https://github.com/gds-smart-office/smart-office-rails\n"
+      
       send_message(bot, message, help)      
     end
     
