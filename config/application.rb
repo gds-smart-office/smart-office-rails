@@ -28,7 +28,7 @@ module SmartOffice
     config.after_initialize do
       @@telegram_bot_token =        ENV["telegram_bot_token"]
       @@pong_ip =                   ENV["pong_ip"]
-      @@drone_ip =                  ENV["drone_ip"]
+      @@recep_ip =                  ENV["recep_ip"]
       @@restart_cooldown =          ENV["restart_cooldown"].to_f
       @@password =                  ENV["password"]
 
@@ -65,8 +65,8 @@ module SmartOffice
           authenticate(bot, message)
         when '/pong'
           pong(bot, message)
-        when '/drone'
-          drone(bot, message)
+        when '/recep'
+          recep(bot, message)
         when '/help'
           help(bot, message)
         when '/debug'
@@ -117,9 +117,9 @@ module SmartOffice
       end
     end
 
-    def drone(bot, message)
+    def recep(bot, message)
       if isAuthorized?(message)
-        send_photo_webcam(bot, message, @@drone_ip, "drone")
+        send_photo_webcam(bot, message, @@recep_ip, "recep")
       else
         send_photo(bot, message, "forbidden.jpg")
       end
@@ -128,7 +128,7 @@ module SmartOffice
     def help(bot, message)
       help =  "Hello, I am Ping La Pong, you can control me by sending these commands:\n\n" +
               "/pong - Check status for Ping Pong table\n" +
-              "/drone - Check status for Drone meeting room\n\n" + 
+              "/recep - Check status for door at Reception area\n\n" + 
               "Don't get too excited and trigger happy in your chat group, you can be considerate by clicking @ppong_bot and sending the commands privately.\n\n" +
               "Of cuz only authorized folks can control me, please find my creators for the /[password].\n\n" +
               "If you wish to contribute, you can check out https://github.com/gds-smart-office/smart-office-rails\n"
@@ -167,7 +167,11 @@ module SmartOffice
     
     # Logger helpers
     def log(message, text="OK")
-      puts "telegram_bot[#{action(message)}][#{user_info(message)}][#{chat_info(message)}]: #{text}"
+      if message
+        puts "telegram_bot[#{action(message)}][#{user_info(message)}][#{chat_info(message)}]: #{text}"
+      else
+        puts "Nil Message!"
+      end
     end
     
     def action(message)
