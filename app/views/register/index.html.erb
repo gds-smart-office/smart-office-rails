@@ -1,0 +1,25 @@
+<script>
+  function register() {
+    $('#camera_msg').show();
+    $.get('register', {
+      name: $("#name").val(),
+      person: $("#person").val()
+    }, function(){
+      console.log("returned sth");
+      $('#camera_msg').text($("#person").val() + " will be coming soon!");
+    });
+  }
+</script>
+<h1>Welcome to Hive!</h1>
+<form class="form-signin" action="#">
+  <input type="text" id="name" class="form-control" placeholder="Who are you?" required autofocus>
+  <input type="text" id="person" class="form-control" placeholder="Who do you want to meet?" required>
+  <button id="signin_btn" class="btn btn-lg btn-primary btn-block" onclick="register()">Sign In</button>
+</form>
+
+<div>
+  <h2 id="camera_msg">Please smile for the camera (:</h2>
+</div>
+<script>
+  $('#camera_msg').hide();
+</script>
