@@ -14,7 +14,7 @@ class RegisterController < ApplicationController
     Telegram::Bot::Client.run(@@telegram_bot_token) do |bot|
       caption = "#{name} is at the reception area, looking for #{person}"
       # send_photo_webcam(bot, @@pong_ip, "pong", caption)
-      send_photo_webcam(bot, @@drone_ip, "drone", caption)
+      send_photo_webcam(bot, @@drone_ip, "recep", caption)
     end
     
     render :json => {:message => "OK"}
