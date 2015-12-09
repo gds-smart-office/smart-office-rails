@@ -34,8 +34,7 @@ module TelegramBotHelper
   def send_photo_webcam(bot, chat_id, webcam_ip, filename, options = {})
     begin
       open(filename, 'wb') do |file|
-        file << open("http://192.168.1.113:8080/photo.jpg").read
-        # file << open("http://#{webcam_ip}", http_basic_authentication: ["admin", ""]).read
+        file << open("http://#{webcam_ip}", http_basic_authentication: ["admin", ""]).read
       end
       post_photo(bot, chat_id, filename, options)
       :success
