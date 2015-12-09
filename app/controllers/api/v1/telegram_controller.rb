@@ -1,7 +1,9 @@
 # require "#{Rails.root}/app/helpers/telegram_bot_helper"
 
-class Api::V1::TelegramController < ApplicationController
+class Api::V1::TelegramController < Api::ApiController
   include TelegramBotHelper
+
+  before_action :api_authenticate
 
   def initialize
     @pong_ip =            ENV["pong_ip"]

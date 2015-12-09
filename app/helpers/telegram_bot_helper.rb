@@ -20,6 +20,16 @@ module TelegramBotHelper
       401
     end
   end
+
+  def token(bot, user_id, chat_id)
+    if is_authorized?(user_id)
+      token = get_auth_token(user_id)
+      post_message(bot, chat_id, "Your token is: #{token}")
+      200
+    else
+      401
+    end
+  end  
   
   def send_photo_webcam(bot, chat_id, webcam_ip, filename, options = {})
     begin
@@ -31,7 +41,6 @@ module TelegramBotHelper
       200
     rescue Exception => e
       400
-      # post_message(bot, chat_id, e.message)
     end
   end
   

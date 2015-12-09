@@ -19,8 +19,12 @@ module UserHelper
     if isAuthorized
       log("#{user_id} is authorized")
     else
-      log("#{user_id} is authorized")
+      log("#{user_id} is unauthorized")
     end
     isAuthorized
   end  
+  
+  def get_auth_token(user_id)
+    User.find_by(user_id: user_id).auth_token
+  end
 end

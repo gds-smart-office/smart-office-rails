@@ -56,10 +56,12 @@ namespace :telegram_bot do
         telegram_pong(bot, user_id, chat_id)
       when '/recep'
         telegram_recep(bot, user_id, chat_id)
+      when '/token'
+        telegram_token(bot, user_id, chat_id)
       when '/help'
         telegram_help(bot, user_id)
-      when '/debug'
-        post_message(bot, message, "debug: #{user_info(message)} #{chat_info(message)}")
+      when '/info'
+        post_message(bot, message, "info: #{user_info(message)} #{chat_info(message)}")
       else
         puts "telegram_bot: else #{message.text}"
     end
@@ -73,6 +75,11 @@ namespace :telegram_bot do
 
   def telegram_recep(bot, user_id, chat_id, options = {})
     code = recep(bot, user_id, chat_id, options)
+    render_response(bot, chat_id, code)
+  end
+  
+  def telegram_token(bot, user_id, chat_id)
+    code = token(bot, user_id, chat_id)
     render_response(bot, chat_id, code)
   end
 
