@@ -30,5 +30,14 @@ module MessageHelper
       messages_per_day.push(count)
     end
     messages_per_day
-  end  
+  end
+
+  def create_message(message)
+    Message.create(
+      user_id: message.from.id,
+      user_name: "#{message.from.first_name} #{message.from.last_name}",
+      chat_id: message.chat.id,
+      chat_title: chat_title(message),
+      action: action(message))
+  end
 end

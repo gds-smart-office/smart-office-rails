@@ -1,4 +1,8 @@
+require_relative "./logger_helper"
+
 module UserHelper
+  include LoggerHelper  
+  
   def authenticate(bot, message)
     log(message, "authenticated")
     User.create(
@@ -10,12 +14,14 @@ module UserHelper
     post_message(bot, message, "Welcome #{message.from.first_name}, you are successfully authenticated.")
   end
 
-  def is_authorized?(message)
-    isAuthorized = User.exists?(user_id: message.from.id)
+  def is_authorized?(user_id)
+    isAuthorized = User.exists?(user_id: user_id)
     if isAuthorized
-      log(message, "authorized")
+      puts "#{user_id} is authorized"
+      # log(message, "authorized")
     else
-      log(message, "unauthorized")
+      puts "#{user_id} is unauthorized"
+      # log(message, "unauthorized")
     end
     isAuthorized
   end  
