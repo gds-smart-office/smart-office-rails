@@ -85,19 +85,21 @@ namespace :telegram_bot do
 
   def telegram_help(bot, chat_id)
     help =  "Hello, I am Ping La Pong, you can control me by sending these commands:\n\n" +
-      "/pong - Check status for Ping Pong table\n" +
-      "/recep - Check status for door at Reception area\n\n" +
-      "Don't get too excited and trigger happy in your chat group, you can be considerate by clicking @ppong_bot and sending the commands privately.\n\n" +
-      "Of cuz only authorized folks can control me, please find my creators for the /[password].\n\n" +
-      "If you wish to contribute, you can check out https://github.com/gds-smart-office/smart-office-rails\n"
+            "/pong - Check status for Ping Pong table\n" +
+            "/recep - Check status for door at Reception area\n\n" +
+            "/token - Get your auth token to access the API\n" +
+            "/info - Get the information of your id and chat id\n" +    
+            "Don't get too excited and trigger happy in your chat group, you can be considerate by clicking @ppong_bot and sending the commands privately.\n\n" +
+            "Of cuz only authorized folks can control me, please find my creators for the /[password].\n\n" +
+            "If you wish to contribute, you can check out https://github.com/gds-smart-office/smart-office-rails\n"
     post_message(bot, chat_id, help)
   end
   
   def render_response(bot, chat_id, code)
     case code
-      when 400
+      when :error
         post_message(bot, chat_id, "Oops something went wrong!")
-      when 401
+      when :unauthorized
         post_photo(bot, chat_id, "forbidden.jpg")
     end    
   end

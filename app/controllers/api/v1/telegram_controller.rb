@@ -23,7 +23,6 @@ class Api::V1::TelegramController < Api::ApiController
   end
 
   def api_recep
-    code = 200
     user_id = params[:user_id]
     chat_id = params[:chat_id]
     caption = params[:caption]
@@ -36,11 +35,11 @@ class Api::V1::TelegramController < Api::ApiController
   
   def render_response(code)
     case code
-      when 200
+      when :success
         render :json => {:status => "success"}
-      when 400
+      when :error
         render :json => {:status => "error"}
-      when 401
+      when :unauthorized
         render :json => {:status => "unauthorized"}
     end
   end

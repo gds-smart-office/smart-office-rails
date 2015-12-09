@@ -9,7 +9,7 @@ module TelegramBotHelper
     if is_authorized?(user_id)
       send_photo_webcam(bot, chat_id, @pong_ip, "pong.jpg", options)
     else
-      401
+      :unauthorized
     end
   end
   
@@ -17,7 +17,7 @@ module TelegramBotHelper
     if is_authorized?(user_id)
       send_photo_webcam(bot, chat_id, @recep_ip, "recep.jpg", options)
     else
-      401
+      :unauthorized
     end
   end
 
@@ -25,9 +25,9 @@ module TelegramBotHelper
     if is_authorized?(user_id)
       token = get_auth_token(user_id)
       post_message(bot, chat_id, "Your token is: #{token}")
-      200
+      :success
     else
-      401
+      :unauthorized
     end
   end  
   
@@ -38,9 +38,9 @@ module TelegramBotHelper
         # file << open("http://#{webcam_ip}", http_basic_authentication: ["admin", ""]).read
       end
       post_photo(bot, chat_id, filename, options)
-      200
+      :success
     rescue Exception => e
-      400
+      :error
     end
   end
   
