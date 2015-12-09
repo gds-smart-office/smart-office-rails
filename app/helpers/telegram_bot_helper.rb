@@ -5,40 +5,33 @@ require_relative "./user_helper"
 module TelegramBotHelper
   include UserHelper
   
-  def pong(bot, user_id, chat_id)
+  def pong(bot, user_id, chat_id, options = {})
     if is_authorized?(user_id)
-      send_photo_webcam(bot, chat_id, @pong_ip, "pong")
+      send_photo_webcam(bot, chat_id, @pong_ip, "pong.jpg", options)
     else
-      post_photo(bot, chat_id, "forbidden.jpg")
+      401
     end
   end
   
-  def recep(bot, user_id, chat_id)
+  def recep(bot, user_id, chat_id, options = {})
     if is_authorized?(user_id)
-      send_photo_webcam(bot, chat_id, @recep_ip, "recep")
+      send_photo_webcam(bot, chat_id, @recep_ip, "recep.jpg", options)
     else
-      post_photo(bot, chat_id, "forbidden.jpg")
+      401
     end
   end
   
-  def help(bot, chat_id)
-    help =  "Hello, I am Ping La Pong, you can control me by sending these commands:\n\n" +
-            "/pong - Check status for Ping Pong table\n" +
-            "/recep - Check status for door at Reception area\n\n" +
-            "Don't get too excited and trigger happy in your chat group, you can be considerate by clicking @ppong_bot and sending the commands privately.\n\n" +
-            "Of cuz only authorized folks can control me, please find my creators for the /[password].\n\n" +
-            "If you wish to contribute, you can check out https://github.com/gds-smart-office/smart-office-rails\n"
-    post_message(bot, chat_id, help)
-  end
-  
-  def send_photo_webcam(bot, chat_id, webcam_ip, name)
+  def send_photo_webcam(bot, chat_id, webcam_ip, filename, options = {})
     begin
-      open("#{name}.jpg", 'wb') do |file|
-        file << open("http://#{webcam_ip}", http_basic_authentication: ["admin", ""]).read
+      open(filename, 'wb') do |file|
+        file << open("http://192.168.1.113:8080/photo.jpg").read
+        # file << open("http://#{webcam_ip}", http_basic_authentication: ["admin", ""]).read
       end
-      post_photo(bot, chat_id, "#{name}.jpg")
+      post_photo(bot, chat_id, filename, options)
+      200
     rescue Exception => e
-      post_message(bot, chat_id, e.message)
+      400
+      # post_message(bot, chat_id, e.message)
     end
   end
   
@@ -59,7 +52,11 @@ module TelegramBotHelper
     bot.api.send_message(chat_id: chat_id, text: text)
   end
 
-  def post_photo(bot, chat_id, filename)
-    bot.api.send_photo(chat_id: chat_id, photo: File.new(filename))
-  end  
+  def post_photo(bot, chat_id, filename, options = {})
+    if !options[:caption].nil?
+      bot.api.send_photo(chat_id: chat_id, caption: options[:caption], photo: File.new(filename))
+    else
+      bot.api.send_photo(chat_id: chat_id, photo: File.new(filename))
+    end
+  end
 end

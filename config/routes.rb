@@ -1,6 +1,12 @@
 Rails.application.routes.draw do
-  get 'register/index'
-  get 'register/register'
+  namespace :api, :defaults => {:format => :json} do
+    namespace :v1 do
+      namespace :telegram do
+        post :pong, to: :api_pong
+        post :recep, to: :api_recep
+      end
+    end
+  end
 
   root 'message#index'
 end

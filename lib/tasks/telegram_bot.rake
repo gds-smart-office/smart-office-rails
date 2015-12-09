@@ -1,11 +1,13 @@
 require "#{Rails.root}/app/helpers/logger_helper"
 require "#{Rails.root}/app/helpers/telegram_bot_helper"
+require "#{Rails.root}/app/helpers/user_helper"
 require "#{Rails.root}/app/helpers/message_helper"
 require 'telegram/bot'
 
 namespace :telegram_bot do
   include LoggerHelper
   include TelegramBotHelper
+  include UserHelper
   include MessageHelper
   
   desc "TODO"
@@ -51,16 +53,45 @@ namespace :telegram_bot do
       when "/#{@password}"
         authenticate(bot, message)
       when '/pong'
-        pong(bot, user_id, chat_id)
+        telegram_pong(bot, user_id, chat_id)
       when '/recep'
-        recep(bot, user_id, chat_id)
+        telegram_recep(bot, user_id, chat_id)
       when '/help'
-        help(bot, user_id)
+        telegram_help(bot, user_id)
       when '/debug'
         post_message(bot, message, "debug: #{user_info(message)} #{chat_info(message)}")
       else
         puts "telegram_bot: else #{message.text}"
     end
     create_message(message)
+  end
+
+  def telegram_pong(bot, user_id, chat_id, options = {})
+    code = pong(bot, user_id, chat_id, options)
+    render_response(bot, chat_id, code)
+  end
+
+  def telegram_recep(bot, user_id, chat_id, options = {})
+    code = recep(bot, user_id, chat_id, options)
+    render_response(bot, chat_id, code)
+  end
+
+  def telegram_help(bot, chat_id)
+    help =  "Hello, I am Ping La Pong, you can control me by sending these commands:\n\n" +
+      "/pong - Check status for Ping Pong table\n" +
+      "/recep - Check status for door at Reception area\n\n" +
+      "Don't get too excited and trigger happy in your chat group, you can be considerate by clicking @ppong_bot and sending the commands privately.\n\n" +
+      "Of cuz only authorized folks can control me, please find my creators for the /[password].\n\n" +
+      "If you wish to contribute, you can check out https://github.com/gds-smart-office/smart-office-rails\n"
+    post_message(bot, chat_id, help)
+  end
+  
+  def render_response(bot, chat_id, code)
+    case code
+      when 400
+        post_message(bot, chat_id, "Oops something went wrong!")
+      when 401
+        post_photo(bot, chat_id, "forbidden.jpg")
+    end    
   end
 end
