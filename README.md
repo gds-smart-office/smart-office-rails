@@ -1,6 +1,6 @@
 # Smart Office
 
-### Installation
+## Installation
 
 (1) Install gems
 ```sh
@@ -22,6 +22,37 @@ $ bundle exec figaro install
 
 ```sh
 telegram_bot_token: [your_telegram_bot_token]
-telegram_authorized_chats: [your_telegram_authorized_chats]
-web_cam_ip: [your_web_cam_ip]
+pong_ip: [your_pong_ip]
+recep_ip: [your_recep_ip]
+restart_cooldown: [your_restart_cooldown]
+password: [your_password]
 ```
+
+## API
+
+### Pong
+|              |                                          |
+|--------------|-------------------------------------------|
+| POST         | http://\<ip_address\>/api/v1/telegram/pong  |
+| Header*      | Authorization: Token token=\<your_token\>   |
+| Params:      |                                           |
+| chat_id*     | \<your_telegram_chat_id\>                   |
+| caption      | \<your_caption\>                            |
+| Responses:   |                                           |
+| Success      | {status: “success”}                       |
+| Error        | {status: “error”}                         |
+| Unauthorized | {status: “unauthorized”}                  |
+
+### Recep
+|              |                                          |
+|--------------|-------------------------------------------|
+| POST         | http://\<ip_address\>/api/v1/telegram/recep  |
+| Header*      | Authorization: Token token=\<your_token\>   |
+| Params:      |                                           |
+| chat_id*     | \<your_telegram_chat_id\>                   |
+| caption      | \<your_caption\>                            |
+| Responses:   |                                           |
+| Success      | {status: “success”}                       |
+| Error        | {status: “error”}                         |
+| Unauthorized | {status: “unauthorized”}                  |
+

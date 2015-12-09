@@ -61,7 +61,7 @@ namespace :telegram_bot do
       when '/help'
         telegram_help(bot, user_id)
       when '/info'
-        post_message(bot, message, "info: #{user_info(message)} #{chat_info(message)}")
+        post_message(bot, chat_id, "info: #{user_info(message)}|#{chat_info(message)}")
       else
         puts "telegram_bot: else #{message.text}"
     end
@@ -84,11 +84,15 @@ namespace :telegram_bot do
   end
 
   def telegram_help(bot, chat_id)
-    help =  "Hello, I am Ping La Pong, you can control me by sending these commands:\n\n" +
+    help =  "Hello, I am Ping La Pong v2.0!\n\n" +
+            "Now I am enchanced with a new feature called Pong as a Service (PongaaS). " +
+            "You will be able to access my commands via secured APIs. " +
+            "The API methods are available at the GitHub link below.\n\n" +
+            "You can control me by sending these commands:\n" +
             "/pong - Check status for Ping Pong table\n" +
-            "/recep - Check status for door at Reception area\n\n" +
+            "/recep - Check status for door at Reception area\n" +
             "/token - Get your auth token to access the API\n" +
-            "/info - Get the information of your id and chat id\n" +    
+            "/info - Get your user id and chat id for the API\n\n" +    
             "Don't get too excited and trigger happy in your chat group, you can be considerate by clicking @ppong_bot and sending the commands privately.\n\n" +
             "Of cuz only authorized folks can control me, please find my creators for the /[password].\n\n" +
             "If you wish to contribute, you can check out https://github.com/gds-smart-office/smart-office-rails\n"
