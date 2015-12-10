@@ -17,6 +17,7 @@ gem 'telegram-bot-ruby'
 gem 'lazy_high_charts'
 gem 'figaro'
 gem 'devise'
+gem 'rails_admin'
 
 group :development, :test do
   gem 'byebug'
