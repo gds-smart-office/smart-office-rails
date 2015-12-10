@@ -28,6 +28,16 @@ restart_cooldown: [your_restart_cooldown]
 password: [your_password]
 ```
 
+(5) Run Telegram bot thread using Rake task
+```sh
+$ rake telegram_bot:run
+```
+
+(6) Run Rails server
+```sh
+$ rails s
+```
+
 ## API
 
 ### Pong
