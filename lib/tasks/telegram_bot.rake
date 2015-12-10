@@ -38,7 +38,8 @@ namespace :telegram_bot do
           end
         end
       rescue Exception => e
-        puts e.message
+        p e.message
+        p e.backtrace
       end
     end
     puts "telegram_bot: terminated"
