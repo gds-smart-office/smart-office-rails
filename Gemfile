@@ -16,6 +16,7 @@ gem 'sdoc',             '~> 0.4.0', group: :doc
 gem 'telegram-bot-ruby'
 gem 'lazy_high_charts'
 gem 'figaro'
+gem 'devise'
 
 group :development, :test do
   gem 'byebug'
