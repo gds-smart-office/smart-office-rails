@@ -45,11 +45,16 @@ module TelegramBotHelper
   
   def action(message)
     action = message.text
-    index = action.index('@')
-    if index != nil
-      action = action[0..(index-1)]
+    if action
+      index = action.index('@')
+      if index != nil
+        action = action[0..(index-1)]
+      end
+      return action
+    else
+      p 'empty message text'
+      return ''
     end
-    action
   end
 
   def chat_title(message)
