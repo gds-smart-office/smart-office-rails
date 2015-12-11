@@ -49,6 +49,8 @@ namespace :telegram_bot do
     action = action(message) 
     user_id = message.from.id
     chat_id = message.chat.id
+    chat_title = chat_title(message)
+    log_message(message, "Request is made")
     
     case action(message)
       when "/#{@password}"
@@ -59,8 +61,12 @@ namespace :telegram_bot do
         telegram_recep(bot, user_id, chat_id)
       when '/token'
         telegram_token(bot, user_id, chat_id)
+      when '/follow'
+        telegram_follow(bot, chat_id, chat_title)
+      when '/unfollow'
+        telegram_unfollow(bot, chat_id)
       when '/help'
-        telegram_help(bot, user_id)
+        telegram_help(bot, chat_id)
       when '/info'
         post_message(bot, chat_id, "info: #{user_info(message)}|#{chat_info(message)}")
       else
@@ -83,6 +89,19 @@ namespace :telegram_bot do
     code = token(bot, user_id, chat_id)
     render_response(bot, chat_id, code)
   end
+  
+  def telegram_follow(bot, chat_id, chat_title)
+    Follower.create(chat_id: chat_id, chat_title: chat_title)
+    post_message(bot, chat_id, "This chat has successfully followed self-checkin Reception area notifications.")
+  end
+
+  def telegram_unfollow(bot, chat_id)
+    follower = Follower.find_by(chat_id: chat_id)
+    if !follower.nil?
+      follower.delete
+    end
+    post_message(bot, chat_id, "This chat has successfully unfollowed self-checkin Reception area notifications.")
+  end  
 
   def telegram_help(bot, chat_id)
     help =  "Hello, I am Ping La Pong v2.0!\n\n" +
@@ -93,6 +112,8 @@ namespace :telegram_bot do
             "/pong - Check status for Ping Pong table\n" +
             "/recep - Check status for door at Reception area\n" +
             "/token - Get your auth token to access the API\n" +
+            "/follow - Follow self-checkin Reception area notifications\n" +
+            "/unfollow - Unfollow self-checkin Reception area notifications\n" +    
             "/info - Get your user id and chat id for the API\n\n" +    
             "Don't get too excited and trigger happy in your chat group, you can be considerate by clicking @ppong_bot and sending the commands privately.\n\n" +
             "Of cuz only authorized folks can control me, please find my creators for the /[password].\n\n" +

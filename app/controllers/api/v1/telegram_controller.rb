@@ -1,7 +1,6 @@
-# require "#{Rails.root}/app/helpers/telegram_bot_helper"
-
 class Api::V1::TelegramController < Api::ApiController
   include TelegramBotHelper
+  include LoggerHelper
 
   before_action :api_authenticate
 
@@ -26,9 +25,22 @@ class Api::V1::TelegramController < Api::ApiController
     user_id = params[:user_id]
     chat_id = params[:chat_id]
     caption = params[:caption]
+    following = params[:following]
 
     Telegram::Bot::Client.run(@telegram_bot_token) do |bot|
-      code = recep(bot, user_id, chat_id, caption.nil?? {} : {caption: caption})
+      if !following.blank? && following == "true"
+        log("Following", {action: "/recep", user_id: user_id})
+        code = :success
+        Follower.all.each do |f|
+          if code == :success
+            code = recep(bot, user_id, f.chat_id, caption.nil?? {} : {caption: caption})
+          end
+        end
+      else
+        log("Following", {action: "/recep", user_id: user_id, chat_id: chat_id})
+        code = recep(bot, user_id, chat_id, caption.nil?? {} : {caption: caption})
+      end
+      
       render_response(code)
     end
   end

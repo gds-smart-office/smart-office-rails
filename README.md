@@ -61,6 +61,7 @@ $ rails s
 | Params:      |                                           |
 | chat_id*     | \<your_telegram_chat_id\>                   |
 | caption      | \<your_caption\>                            |
+| following    | true/false                                |
 | Responses:   |                                           |
 | Success      | {status: “success”}                       |
 | Error        | {status: “error”}                         |

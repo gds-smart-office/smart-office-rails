@@ -7,8 +7,18 @@ module LoggerHelper
     end 
   end
 
-  def log(text="OK")
-      puts "telegram_bot: #{text}"
+  def log(text="OK", options = {})
+    info = ""
+    if !options[:action].nil?
+      info += "[action=#{options[:action]}]"
+    end
+    if !options[:user_id].nil?
+      info += "[user=#{options[:user_id]}]"
+    end
+    if !options[:chat_id].nil?
+      info += "[chat=#{options[:chat_id]}]"
+    end
+      puts "telegram_bot#{info}: #{text}"
   end
 
   def user_info(message)
@@ -16,6 +26,6 @@ module LoggerHelper
   end
 
   def chat_info(message)
-    "chat=#{chat_title(message)}, #{message.chat.id}"
+    "chat=#{chat_title(message)},#{message.chat.id}"
   end
 end
