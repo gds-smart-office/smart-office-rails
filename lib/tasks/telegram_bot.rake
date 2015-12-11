@@ -91,7 +91,9 @@ namespace :telegram_bot do
   end
   
   def telegram_follow(bot, chat_id, chat_title)
-    Follower.create(chat_id: chat_id, chat_title: chat_title)
+    if Follower.find_by(chat_id: chat_id).nil?
+      Follower.create(chat_id: chat_id, chat_title: chat_title)
+    end
     post_message(bot, chat_id, "This chat has successfully followed self-checkin Reception area notifications.")
   end
 

@@ -5,8 +5,10 @@ module UserHelper
   
   def authenticate(bot, message)
     log_message(message, "authenticated")
+    user_id = message.from.id
+    if User.find_by(user_id: user_id)
     User.create(
-      user_id: message.from.id,
+      user_id: user_id,
       first_name: message.from.first_name,
       last_name: message.from.last_name,
       username: message.from.username,
@@ -14,6 +16,7 @@ module UserHelper
       password: "password",
       password_confirmation: "password",
     )
+    end
     post_message(bot, message.chat.id, "Welcome #{message.from.first_name}, you are successfully authenticated.")
   end
 
