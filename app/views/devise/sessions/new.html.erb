@@ -1,7 +1,6 @@
 <h2>Please Log in</h2>
-
 <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: {class:"form-horizontal"}) do |f| %>
-  <%= devise_error_messages! %>
+  <%= render "layouts/messages" %>
   
   <div class="form-group">
     <%= f.label :email, class: "col-sm-2 control-label" %>

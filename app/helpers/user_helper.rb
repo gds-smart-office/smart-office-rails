@@ -15,6 +15,7 @@ module UserHelper
       email: "#{message.from.username}@example.com",
       password: "password",
       password_confirmation: "password",
+      admin: false
     )
     end
     post_message(bot, message.chat.id, "Welcome #{message.from.first_name}, you are successfully authenticated.")

@@ -18,3 +18,7 @@
 @import "bootstrap";
 
 body.container { margin-top: 60px; }
+
+.alert-notice { @extend .alert-success; }
+
+.alert-alert { @extend .alert-danger;  }

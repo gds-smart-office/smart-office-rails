@@ -5,3 +5,14 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+
+User.create(
+  user_id: 1,
+  first_name: "Admin",
+  last_name: "PLP",
+  username: "admin",
+  email: "admin@pinglapong.com",
+  password: "password",
+  password_confirmation: "password",
+  admin: true
+)
