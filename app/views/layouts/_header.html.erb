@@ -3,5 +3,18 @@
     <div class="navbar-header">
       <%= link_to "Smart Office", "", class: "navbar-brand" %>
     </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+        <% if user_signed_in? %>
+          <li><%= link_to "Welcome #{current_user.name}!", edit_user_registration_path %></li>
+          <% if current_user.admin? %>
+            <li><%= link_to "Admin", "/admin" %></li>
+          <% end %>
+          <li><%= link_to "Sign out", destroy_user_session_path, method: :delete%></li>
+        <% else %>
+          <li><%= link_to "Sign in", new_user_session_path %></li>
+        <% end %>
+      </ul>
+    </div>  
   </div>  
 </nav>
