@@ -18,6 +18,8 @@ gem 'lazy_high_charts'
 gem 'figaro'
 gem 'devise'
 gem 'rails_admin'
+gem 'google_drive'
+gem 'whenever'
 
 group :development, :test do
   gem 'byebug'
