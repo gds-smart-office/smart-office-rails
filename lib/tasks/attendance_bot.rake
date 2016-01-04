@@ -46,14 +46,14 @@ namespace :attendance_bot do
   end
   
   def on_leave_message(users, date)
-    message = "Good morning, today (#{date.strftime('%d %b %Y')}) "
+    message = "Hi everyone, today (#{date.strftime('%d %b %Y')}) "
     if users.count == 0
-      message += "no one is on leave.\n"
+      message += "no one is out-of-office.\n"
     else
-      message += "the following personnel are on leave:\n"
+      message += "the following personnel are out-of-office:\n"
       users.each_with_index do |user, index|
         message += "#{index+1}. #{user}\n"
-      end 
+      end
     end
     message
   end
