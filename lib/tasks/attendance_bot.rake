@@ -1,5 +1,5 @@
 require "#{Rails.root}/app/helpers/telegram_bot_helper"
-
+require "ext/Date"
 require "google/api_client"
 require "google_drive"
 
@@ -10,11 +10,12 @@ namespace :attendance_bot do
   task run: :environment do
     @telegram_bot_token = ENV["telegram_bot_token"]
     @gsheet_key = ENV["gsheet_key"]
+    
     @gdrive_api_id = ENV["gdrive_api_id"]
     @gdrive_api_secret = ENV["gdrive_api_secret"]
     @broadcast_chat_id = ENV["broadcast_chat_id"]
     
-    today = Date.today
+    today = Date.today + 1
     personnels = get_on_leave_personnels(today)
     message = on_leave_message(personnels[0], personnels[1], today)
     send_telegram_message(message)
@@ -40,7 +41,7 @@ namespace :attendance_bot do
         if personnel.within?(date)
           personnels[0].append(personnel)
         end
-        if personnel.within?(date + 1)
+        if personnel.within?(date.next_working_day)
           personnels[1].append(personnel)
         end          
       rescue Exception => e
@@ -53,8 +54,8 @@ namespace :attendance_bot do
   end
   
   def on_leave_message(today_personnels, tomorrow_personnels, date)
-    message = personnels_message("Hi everyone, today (#{date.strftime('%d %b %Y')}) ", today_personnels)
-    message += personnels_message("\nTomorrow (#{(date+1).strftime('%d %b %Y')}) ", tomorrow_personnels)
+    message = personnels_message("Hi everyone, today (#{date.to_s}) ", today_personnels)
+    message += personnels_message("\nNext working day (#{(date.next_working_day).to_s}) ", tomorrow_personnels)
     message
   end
   
