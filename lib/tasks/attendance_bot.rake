@@ -15,44 +15,61 @@ namespace :attendance_bot do
     @broadcast_chat_id = ENV["broadcast_chat_id"]
     
     today = Date.today
-    users = get_on_leave_users(today)
-    message = on_leave_message(users, today)
+    personnels = get_on_leave_personnels(today)
+    message = on_leave_message(personnels[0], personnels[1], today)
     send_telegram_message(message)
   end
   
-  def get_on_leave_users(date)
+  def get_on_leave_personnels(date)
     config = "{\"client_id\": \"#{@gdrive_api_id}\",\"client_secret\": \"#{@gdrive_api_secret}\"}"
     session = GoogleDrive.saved_session(config)
     ws = session.spreadsheet_by_key(@gsheet_key).worksheets[0]
     
     r = 2
-    user = ws[r, 1]
-    users = []
-    while !user.blank? do
+    personnels = []
+    personnels.append([])
+    personnels.append([])
+    while !ws[r, 1].blank? do
       begin
-        start_date = Date.parse(ws[r, 2])
-        end_date = Date.parse(ws[r, 3])
-        if (end_date - start_date) < 365 && date.between?(start_date, end_date)
-          users.append(user)
+        personnel = Personnel.new(
+          name: ws[r, 1],
+          start_date: Date.parse(ws[r, 2]),
+          end_date: Date.parse(ws[r, 3]),
+          description: ws[r, 4]
+        )        
+        if personnel.within?(date)
+          personnels[0].append(personnel)
         end
+        if personnel.within?(date + 1)
+          personnels[1].append(personnel)
+        end          
       rescue Exception => e
-        p "attendance_bot[#{user}]: #{e.message}"
+        p "attendance_bot[#{personnel.name}]: #{e.message}"
       ensure
         r = r + 1
-        user = ws[r, 1]
       end
     end
-    users
+    personnels
   end
   
-  def on_leave_message(users, date)
-    message = "Hi everyone, today (#{date.strftime('%d %b %Y')}) "
-    if users.count == 0
+  def on_leave_message(today_personnels, tomorrow_personnels, date)
+    message = personnels_message("Hi everyone, today (#{date.strftime('%d %b %Y')}) ", today_personnels)
+    message += personnels_message("\nTomorrow (#{(date+1).strftime('%d %b %Y')}) ", tomorrow_personnels)
+    message
+  end
+  
+  def personnels_message(text, personnels)
+    message = text
+    if personnels.count == 0
       message += "no one is out-of-office.\n"
     else
       message += "the following personnel are out-of-office:\n"
-      users.each_with_index do |user, index|
-        message += "#{index+1}. #{user}\n"
+      personnels.each_with_index do |personnel, index|
+        message += "#{index+1}. #{personnel.name}"
+        if !personnel.description.blank?
+          message += ": #{personnel.description}"
+        end
+        message += "\n"
       end
     end
     message
