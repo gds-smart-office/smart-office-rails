@@ -15,7 +15,7 @@ namespace :attendance_bot do
     @gdrive_api_secret = ENV["gdrive_api_secret"]
     @broadcast_chat_id = ENV["broadcast_chat_id"]
     
-    today = Date.today + 1
+    today = Date.today
     personnels = get_on_leave_personnels(today)
     message = on_leave_message(personnels[0], personnels[1], today)
     send_telegram_message(message)
