@@ -56,6 +56,7 @@ namespace :attendance_bot do
   def on_leave_message(today_personnels, tomorrow_personnels, date)
     message = personnels_message("Hi everyone, today (#{date.to_s}) ", today_personnels)
     message += personnels_message("\nNext working day (#{(date.next_working_day).to_s}) ", tomorrow_personnels)
+    message += "\nUpdate your availability: https://docs.google.com/spreadsheets/d/1MscMBZkiHnaG4DcuolJHqTcDHZd_apYI78xgzzhfuxw/edit#gid=1961192979"
     message
   end
   
